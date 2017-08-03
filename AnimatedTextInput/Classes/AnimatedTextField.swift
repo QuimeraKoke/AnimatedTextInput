@@ -1,6 +1,6 @@
 import UIKit
 
-final public class AnimatedTextField: UITextField {
+final internal class AnimatedTextField: UITextField {
 
     enum TextFieldType {
         case text
@@ -10,13 +10,9 @@ final public class AnimatedTextField: UITextField {
     }
 
     fileprivate let defaultPadding: CGFloat = -16
-    fileprivate let clearButtonPadding: CGFloat = -8
 
     var rightViewPadding: CGFloat
-    weak public var textInputDelegate: TextInputDelegate?
-
-    public var textAttributes: [String: Any]?
-    public var contentInset: UIEdgeInsets = .zero
+    weak var textInputDelegate: TextInputDelegate?
 
     fileprivate var disclosureButtonAction: ((Void) -> Void)?
 
@@ -28,10 +24,9 @@ final public class AnimatedTextField: UITextField {
         setup()
     }
 
-    required public init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         self.rightViewPadding = defaultPadding
 
-        
         super.init(coder: aDecoder)
 
         setup()
@@ -41,44 +36,9 @@ final public class AnimatedTextField: UITextField {
         delegate = self
         addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
     }
-    
-    @discardableResult override public func becomeFirstResponder() -> Bool {
-        if let alignment = (textAttributes?[NSParagraphStyleAttributeName] as? NSMutableParagraphStyle)?.alignment {
-            textAlignment = alignment
-        }
-        return super.becomeFirstResponder()
-    }
 
-    override public func rightViewRect(forBounds bounds: CGRect) -> CGRect {
+    override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
         return super.rightViewRect(forBounds: bounds).offsetBy(dx: rightViewPadding, dy: 0)
-    }
-
-    override public func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
-        return super.clearButtonRect(forBounds: bounds).offsetBy(dx: clearButtonPadding, dy: 0)
-    }
-    
-    override public func textRect(forBounds bounds: CGRect) -> CGRect {
-        var width = bounds.width
-        if clearButtonMode == .always || clearButtonMode == .unlessEditing {
-            width = bounds.width - clearButtonRect(forBounds: bounds).width * 2
-        }
-        return CGRect(x: bounds.origin.x + contentInset.left,
-                      y: bounds.origin.y + contentInset.top,
-                      width: width - contentInset.left - contentInset.right,
-                      height: bounds.height - contentInset.top - contentInset.bottom)
-    }
-
-    override public func editingRect(forBounds bounds: CGRect) -> CGRect {
-        var width = bounds.width
-        if clearButtonMode != .never {
-            width = bounds.width - clearButtonRect(forBounds: bounds).width * 2
-        } else if let _ = rightView {
-            width = bounds.width - rightViewRect(forBounds: bounds).width * 2
-        }
-        return CGRect(x: bounds.origin.x + contentInset.left,
-                      y: bounds.origin.y + contentInset.top,
-                      width: width - contentInset.left - contentInset.right,
-                      height: bounds.height - contentInset.top - contentInset.bottom)
     }
 
     func add(disclosureButton button: UIButton, action: @escaping ((Void) -> Void)) {
@@ -96,76 +56,59 @@ final public class AnimatedTextField: UITextField {
     }
 
     @objc fileprivate func textFieldDidChange() {
-        if let text = text {
-            attributedText = NSAttributedString(string: text, attributes: textAttributes)
-        }
-        textInputDelegate?.textInputDidChange(textInput: self)
+        textInputDelegate?.textInputDidChange(self)
     }
 }
 
 extension AnimatedTextField: TextInput {
 
-    public func changeReturnKeyType(with newReturnKeyType: UIReturnKeyType) {
-        returnKeyType = newReturnKeyType
-    }
+    var view: UIView { return self }
 
-    public func currentPosition(from: UITextPosition, offset: Int) -> UITextPosition? {
-        return position(from: from, offset: offset)
-    }
-    
-    public func changeClearButtonMode(with newClearButtonMode: UITextFieldViewMode) {
-        clearButtonMode = newClearButtonMode
-    }
-
-    public var currentText: String? {
+    var currentText: String? {
         get { return text }
         set { self.text = newValue }
     }
 
-    public var currentSelectedTextRange: UITextRange? {
-        get { return self.selectedTextRange }
-        set { self.selectedTextRange = newValue }
-    }
-
-    open var currentBeginningOfDocument: UITextPosition? {
-        get { return self.beginningOfDocument }
+    var textAttributes: [String: AnyObject] {
+        get { return typingAttributes as [String : AnyObject]? ?? [:] }
+        set { self.typingAttributes = textAttributes }
     }
 }
 
 extension AnimatedTextField: TextInputError {
 
-    public func configureErrorState(with message: String?) {
+    func configureErrorState(with message: String?) {
         placeholder = message
     }
 
-    public func removeErrorHintMessage() {
+    func removeErrorHintMessage() {
         placeholder = nil
     }
 }
 
 extension AnimatedTextField: UITextFieldDelegate {
 
-    public func textFieldDidBeginEditing(_ textField: UITextField) {
-        textInputDelegate?.textInputDidBeginEditing(textInput: self)
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textInputDelegate?.textInputDidBeginEditing(self)
     }
 
-    public func textFieldDidEndEditing(_ textField: UITextField) {
-        textInputDelegate?.textInputDidEndEditing(textInput: self)
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        textInputDelegate?.textInputDidEndEditing(self)
     }
 
-    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        return textInputDelegate?.textInput(textInput: self, shouldChangeCharactersInRange: range, replacementString: string) ?? true
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        return textInputDelegate?.textInput(self, shouldChangeCharactersInRange: range, replacementString: string) ?? true
     }
 
-    public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        return textInputDelegate?.textInputShouldBeginEditing(textInput: self) ?? true
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        return textInputDelegate?.textInputShouldBeginEditing(self) ?? true
     }
 
-    public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-        return textInputDelegate?.textInputShouldEndEditing(textInput: self) ?? true
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        return textInputDelegate?.textInputShouldEndEditing(self) ?? true
     }
 
-    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        return textInputDelegate?.textInputShouldReturn(textInput: self) ?? true
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        return textInputDelegate?.textInputShouldReturn(self) ?? true
     }
 }

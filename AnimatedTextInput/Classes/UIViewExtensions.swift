@@ -21,38 +21,14 @@ extension UIView {
                            constant: constant).isActive = true
     }
 
-    @discardableResult func pinTrailing(toTrailingOf view: UIView, constant: CGFloat) -> NSLayoutConstraint {
-        let constraint = NSLayoutConstraint(item: view,
-                           attribute: .trailing,
-                           relatedBy: .equal,
-                           toItem: self,
-                           attribute: .trailing,
-                           multiplier: 1.0,
-                           constant: -constant)
-        constraint.isActive = true
-        return constraint
-    }
-
-    @discardableResult func pinTrailing(toLeadingOf view: UIView, constant: CGFloat) -> NSLayoutConstraint {
-        let constraint = NSLayoutConstraint(item: view,
-                                            attribute: .leading,
-                                            relatedBy: .equal,
-                                            toItem: self,
-                                            attribute: .trailing,
-                                            multiplier: 1.0,
-                                            constant: -constant)
-        constraint.isActive = true
-        return constraint
-    }
-
-    func alignHorizontalAxis(toSameAxisOfView view: UIView) {
+    func pinTrailing(toTrailingOf view: UIView, constant: CGFloat) {
         NSLayoutConstraint(item: view,
-                           attribute: .centerY,
+                           attribute: .trailing,
                            relatedBy: .equal,
                            toItem: self,
-                           attribute: .centerY,
+                           attribute: .trailing,
                            multiplier: 1.0,
-                           constant: 0.0).isActive = true
+                           constant: -constant).isActive = true
     }
 
     func pinTop(toTopOf view: UIView, constant: CGFloat) {
@@ -65,16 +41,14 @@ extension UIView {
                            constant: constant).isActive = true
     }
 
-    @discardableResult func pinBottom(toBottomOf view: UIView, constant: CGFloat) -> NSLayoutConstraint {
-        let constraint = NSLayoutConstraint(item: view,
+    func pinBottom(toBottomOf view: UIView, constant: CGFloat) {
+        NSLayoutConstraint(item: view,
                            attribute: .bottom,
                            relatedBy: .equal,
                            toItem: self,
                            attribute: .bottom,
                            multiplier: 1.0,
-                           constant: -constant)
-        constraint.isActive = true
-        return constraint
+                           constant: -constant).isActive = true
     }
 
     func pinBottom(toTopOf view: UIView, constant: CGFloat) {

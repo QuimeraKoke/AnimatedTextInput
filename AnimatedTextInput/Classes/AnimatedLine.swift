@@ -1,6 +1,6 @@
 import UIKit
 
-open class AnimatedLine: UIView {
+public final class AnimatedLine: UIView {
 
     enum FillType {
         case leftToRight
@@ -40,7 +40,7 @@ open class AnimatedLine: UIView {
         addLine()
     }
 
-    override open func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
 
         lineLayer.frame = bounds

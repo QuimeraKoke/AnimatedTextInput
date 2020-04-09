@@ -51,9 +51,9 @@ final internal class AnimatedTextField: UITextField {
         return super.rightViewRect(forBounds: bounds).offsetBy(dx: rightViewPadding, dy: 0)
     }
 
-    override public func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
-        return super.clearButtonRect(forBounds: bounds).offsetBy(dx: clearButtonPadding, dy: 0)
-    }
+//    override public func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
+//        return super.clearButtonRect(forBounds: bounds).offsetBy(dx: clearButtonPadding, dy: 0)
+//    }
     
     override public func textRect(forBounds bounds: CGRect) -> CGRect {
         var width = bounds.width
@@ -95,7 +95,7 @@ final internal class AnimatedTextField: UITextField {
     }
 
     @objc fileprivate func textFieldDidChange() {
-        textInputDelegate?.textInputDidChange(textInput: self)
+        textInputDelegate?.textInputDidChange(self)
     }
 }
 
@@ -117,38 +117,38 @@ extension AnimatedTextField: TextInput {
         clearButtonMode = newClearButtonMode
     }
 
-    public var currentText: String? {
+    @available(iOS 8.0, *)
     var view: UIView { return self }
-
     var currentText: String? {
         get { return text }
         set { self.text = newValue }
     }
     
-    public var autocorrection: UITextAutocorrectionType {
+    var autocorrection: UITextAutocorrectionType {
         get { return self.autocorrectionType }
         set { self.autocorrectionType = newValue }
     }
 
     @available(iOS 10.0, *)
-    public var currentTextContentType: UITextContentType {
+    var currentTextContentType: UITextContentType {
         get { return self.textContentType }
         set { self.textContentType = newValue }
     }
 
-    var textAttributes: [String: AnyObject] {
-        get { return typingAttributes as [String : AnyObject]? ?? [:] }
-        set { self.typingAttributes = textAttributes }
-    public var currentSelectedTextRange: UITextRange? {
+//    var textAttributes: [String: AnyObject] {
+//        get { return typingAttributes as [String : AnyObject]? ?? [:] }
+//        set { self.typingAttributes = textAttributes }
+        
+    var currentSelectedTextRange: UITextRange? {
         get { return self.selectedTextRange }
         set { self.selectedTextRange = newValue }
     }
 
-    public var currentBeginningOfDocument: UITextPosition? {
+    var currentBeginningOfDocument: UITextPosition? {
         get { return self.beginningOfDocument }
     }
     
-    public var currentKeyboardAppearance: UIKeyboardAppearance {
+    var currentKeyboardAppearance: UIKeyboardAppearance {
         get { return self.keyboardAppearance }
         set { self.keyboardAppearance = newValue}
     }

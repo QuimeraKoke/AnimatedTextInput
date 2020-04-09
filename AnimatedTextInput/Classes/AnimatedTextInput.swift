@@ -70,7 +70,7 @@ open class AnimatedTextInput: UIControl {
 
     }
     
-    open var placeholderAlignment: CATextLayer.Alignment = .natural {
+    open var placeholderAlignment: CATextLayerAlignmentMode = .natural {
         didSet {
             placeholderLayer.alignmentMode = CATextLayerAlignmentMode(rawValue: String(describing: placeholderAlignment))
         }
@@ -165,7 +165,7 @@ open class AnimatedTextInput: UIControl {
 
     open var textAttributes: [NSAttributedString.Key: Any]? {
         didSet {
-            guard var textInputAttributes = textInput.textAttributes else {
+            guard let textInputAttributes = textInput.textAttributes else {
                 textInput.textAttributes = textAttributes
                 return
             }
@@ -173,7 +173,9 @@ open class AnimatedTextInput: UIControl {
                 textInput.textAttributes = nil
                 return
             }
-            textInput.textAttributes = textInputAttributes.merge(dict: textAttributes!)
+            textInput.textAttributes = textInputAttributes.merging(textAttributes!, uniquingKeysWith: {(key1: Any, key2: Any) in
+                return key1
+            })
         }
     }
 
@@ -293,7 +295,7 @@ open class AnimatedTextInput: UIControl {
         placeholderLayer.backgroundColor = UIColor.clear.cgColor
         // Some letters like 'g' or 'á' were not rendered properly, the frame need to be about 20% higher than the font size
         let frameHeightCorrectionFactor: CGFloat = 1.2
-        placeholderLayer.frame = CGRect(origin: placeholderPosition, size: CGSize(width: bounds.width, height: fontSize * frameHeightCorrectionFactor))
+        placeholderLayer.frame = CGRect(origin: placeholderPosition, size: CGSize(width: bounds.width, height: style.textInputFont.pointSize * frameHeightCorrectionFactor))
         layer.addSublayer(placeholderLayer)
     }
 
@@ -493,7 +495,7 @@ extension AnimatedTextInput: TextInputDelegate {
     public func textInputDidChange(_ textInput: TextInput) {
         updateCounter()
         sendActions(for: .editingChanged)
-        delegate?.animatedTextInputDidChange?(animatedTextInput: self)
+        delegate?.animatedTextInputDidChange?(self)
     }
 
     public func textInput(_ textInput: TextInput, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {

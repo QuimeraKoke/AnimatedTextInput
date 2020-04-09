@@ -58,7 +58,7 @@ fileprivate struct AnimatedTextInputEmailConfigurator {
 
 fileprivate struct AnimatedTextInputPasswordConfigurator {
     
-    static func generate(toggleable: Bool) -> TextInput {
+    static func generate() -> TextInput {
         let textField = AnimatedTextField()
         textField.rightViewMode = .whileEditing
         textField.isSecureTextEntry = true
@@ -67,7 +67,7 @@ fileprivate struct AnimatedTextInputPasswordConfigurator {
         let bundle = Bundle(path: Bundle(for: AnimatedTextInput.self).path(forResource: "AnimatedTextInput", ofType: "bundle")!)
         let normalImage = UIImage(named: "cm_icon_input_eye_normal", in: bundle, compatibleWith: nil)
         let selectedImage = UIImage(named: "cm_icon_input_eye_selected", in: bundle, compatibleWith: nil)
-        disclosureButton.setImage(normalImage, for: UIControlState())
+        disclosureButton.setImage(normalImage, for: UIControl.State())
         disclosureButton.setImage(selectedImage, for: .selected)
         textField.add(disclosureButton: disclosureButton) {
             disclosureButton.isSelected = !disclosureButton.isSelected

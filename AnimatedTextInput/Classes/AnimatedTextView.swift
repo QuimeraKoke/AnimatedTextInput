@@ -41,6 +41,15 @@ final internal class AnimatedTextView: UITextView {
 }
 
 extension AnimatedTextView: TextInput {
+    var currentSelectedTextRange: UITextRange? {
+        get {
+            return self.currentSelectedTextRange
+        }
+        set {
+            self.currentSelectedTextRange = newValue
+        }
+    }
+    
     public func configureInputView(newInputView: UIView) {
         inputView = newInputView
     }
@@ -52,10 +61,10 @@ extension AnimatedTextView: TextInput {
         set { self.text = newValue }
     }
 
-    var textAttributes: [String: AnyObject] {
-        get { return typingAttributes as [String : AnyObject] }
-        set { self.typingAttributes = textAttributes }
-    }
+//    var textAttributes: [String: AnyObject] {
+//        get { return typingAttributes as [String : AnyObject] }
+//        set { self.typingAttributes = textAttributes }
+//    }
 
     public var currentBeginningOfDocument: UITextPosition? {
         return self.beginningOfDocument

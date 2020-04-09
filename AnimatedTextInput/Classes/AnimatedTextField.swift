@@ -12,11 +12,14 @@ final internal class AnimatedTextField: UITextField {
     fileprivate let defaultPadding: CGFloat = -16
 
     var rightViewPadding: CGFloat
-    weak var textInputDelegate: TextInputDelegate?
+    weak public var textInputDelegate: TextInputDelegate?
 
-    fileprivate var disclosureButtonAction: ((Void) -> Void)?
+    public var textAttributes: [NSAttributedString.Key: Any]?
+    public var contentInset: UIEdgeInsets = .zero
 
-    override init(frame: CGRect) {
+    fileprivate var disclosureButtonAction: (() -> Void)?
+
+    override public init(frame: CGRect) {
         self.rightViewPadding = defaultPadding
 
         super.init(frame: frame)
@@ -36,12 +39,48 @@ final internal class AnimatedTextField: UITextField {
         delegate = self
         addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
     }
+    
+    @discardableResult override public func becomeFirstResponder() -> Bool {
+        if let alignment = (textAttributes?[NSAttributedString.Key.paragraphStyle] as? NSMutableParagraphStyle)?.alignment {
+            textAlignment = alignment
+        }
+        return super.becomeFirstResponder()
+    }
 
     override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
         return super.rightViewRect(forBounds: bounds).offsetBy(dx: rightViewPadding, dy: 0)
     }
 
-    func add(disclosureButton button: UIButton, action: @escaping ((Void) -> Void)) {
+    override public func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
+        return super.clearButtonRect(forBounds: bounds).offsetBy(dx: clearButtonPadding, dy: 0)
+    }
+    
+    override public func textRect(forBounds bounds: CGRect) -> CGRect {
+        var width = bounds.width
+        if clearButtonMode == .always || clearButtonMode == .unlessEditing {
+            width = bounds.width - clearButtonRect(forBounds: bounds).width * 2
+        }
+        
+        return CGRect(x: bounds.origin.x + contentInset.left,
+                      y: bounds.origin.y + contentInset.top,
+                      width: width - contentInset.left - contentInset.right,
+                      height: bounds.height - contentInset.top - contentInset.bottom)
+    }
+
+    override public func editingRect(forBounds bounds: CGRect) -> CGRect {
+        var width = bounds.width
+        if clearButtonMode != .never {
+            width = bounds.width - clearButtonRect(forBounds: bounds).width * 2
+        } else if let _ = rightView {
+            width = bounds.width - rightViewRect(forBounds: bounds).width * 2
+        }
+        return CGRect(x: bounds.origin.x + contentInset.left,
+                      y: bounds.origin.y + contentInset.top,
+                      width: width - contentInset.left - contentInset.right,
+                      height: bounds.height - contentInset.top - contentInset.bottom)
+    }
+
+    func add(disclosureButton button: UIButton, action: @escaping (() -> Void)) {
         let selector = #selector(disclosureButtonPressed)
         if disclosureButtonAction != nil, let previousButton = rightView as? UIButton {
             previousButton.removeTarget(self, action: selector, for: .touchUpInside)
@@ -56,22 +95,62 @@ final internal class AnimatedTextField: UITextField {
     }
 
     @objc fileprivate func textFieldDidChange() {
-        textInputDelegate?.textInputDidChange(self)
+        textInputDelegate?.textInputDidChange(textInput: self)
     }
 }
 
 extension AnimatedTextField: TextInput {
 
+    public func configureInputView(newInputView: UIView) {
+        inputView = newInputView
+    }
+
+    public func changeReturnKeyType(with newReturnKeyType: UIReturnKeyType) {
+        returnKeyType = newReturnKeyType
+    }
+    
+    public func currentPosition(from: UITextPosition, offset: Int) -> UITextPosition? {
+        return position(from: from, offset: offset)
+    }
+    
+    public func changeClearButtonMode(with newClearButtonMode: UITextField.ViewMode) {
+        clearButtonMode = newClearButtonMode
+    }
+
+    public var currentText: String? {
     var view: UIView { return self }
 
     var currentText: String? {
         get { return text }
         set { self.text = newValue }
     }
+    
+    public var autocorrection: UITextAutocorrectionType {
+        get { return self.autocorrectionType }
+        set { self.autocorrectionType = newValue }
+    }
+
+    @available(iOS 10.0, *)
+    public var currentTextContentType: UITextContentType {
+        get { return self.textContentType }
+        set { self.textContentType = newValue }
+    }
 
     var textAttributes: [String: AnyObject] {
         get { return typingAttributes as [String : AnyObject]? ?? [:] }
         set { self.typingAttributes = textAttributes }
+    public var currentSelectedTextRange: UITextRange? {
+        get { return self.selectedTextRange }
+        set { self.selectedTextRange = newValue }
+    }
+
+    public var currentBeginningOfDocument: UITextPosition? {
+        get { return self.beginningOfDocument }
+    }
+    
+    public var currentKeyboardAppearance: UIKeyboardAppearance {
+        get { return self.keyboardAppearance }
+        set { self.keyboardAppearance = newValue}
     }
 }
 

@@ -2,7 +2,22 @@ import UIKit
 
 final internal class AnimatedTextView: UITextView {
 
-    weak var textInputDelegate: TextInputDelegate?
+    public var textAttributes: [NSAttributedString.Key: Any]? {
+        didSet {
+            guard let attributes = textAttributes else { return }
+            typingAttributes = Dictionary(uniqueKeysWithValues: attributes.lazy.map { ($0.key, $0.value) })
+        }
+    }
+
+    public override var font: UIFont? {
+        didSet {
+            var attributes = typingAttributes
+            attributes[NSAttributedString.Key.font] = font
+            textAttributes = Dictionary(uniqueKeysWithValues: attributes.lazy.map { ($0.key, $0.value)})
+        }
+    }
+
+    public weak var textInputDelegate: TextInputDelegate?
 
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
@@ -26,6 +41,9 @@ final internal class AnimatedTextView: UITextView {
 }
 
 extension AnimatedTextView: TextInput {
+    public func configureInputView(newInputView: UIView) {
+        inputView = newInputView
+    }
 
     var view: UIView { return self }
 
@@ -38,6 +56,37 @@ extension AnimatedTextView: TextInput {
         get { return typingAttributes as [String : AnyObject] }
         set { self.typingAttributes = textAttributes }
     }
+
+    public var currentBeginningOfDocument: UITextPosition? {
+        return self.beginningOfDocument
+    }
+    
+    public var currentKeyboardAppearance: UIKeyboardAppearance {
+        get { return self.keyboardAppearance }
+        set { self.keyboardAppearance = newValue}
+    }
+
+    public var autocorrection: UITextAutocorrectionType {
+        get { return self.autocorrectionType }
+        set { self.autocorrectionType = newValue }
+    }
+
+    @available(iOS 10.0, *)
+    public var currentTextContentType: UITextContentType {
+        get { return self.textContentType }
+        set { self.textContentType = newValue }
+    }
+
+    public func changeReturnKeyType(with newReturnKeyType: UIReturnKeyType) {
+        returnKeyType = newReturnKeyType
+    }
+    
+    public func currentPosition(from: UITextPosition, offset: Int) -> UITextPosition? {
+        return position(from: from, offset: offset)
+    }
+    
+    public func changeClearButtonMode(with newClearButtonMode: UITextField.ViewMode) {}
+    
 }
 
 extension AnimatedTextView: UITextViewDelegate {

@@ -8,13 +8,17 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         let inputAccessoryButton = UIButton(type: .system)
+        inputAccessoryButton.setTitleColor(UIColor.white, for: .normal)
         inputAccessoryButton.setTitle("Input accessory view", for: .normal)
-        inputAccessoryButton.frame.size.height = 64
-        inputAccessoryButton.backgroundColor = .red
+        inputAccessoryButton.frame.size.height = 40
+        inputAccessoryButton.backgroundColor = UIColor.blue.withAlphaComponent(0.4)
 
         textInputs[0].accessibilityLabel = "standard_text_input"
         textInputs[0].placeHolderText = "Normal text"
         textInputs[0].inputAccessoryView = inputAccessoryButton
+        if #available(iOS 11.0, *) {
+            textInputs[1].textContentType = .password
+        }
 
         textInputs[1].placeHolderText = "Password"
         textInputs[1].type = .password(toggleable: true)
@@ -27,13 +31,13 @@ class ViewController: UIViewController {
         textInputs[3].tapAction = { [weak self] in
             guard let strongself = self else { return }
             strongself.tap()
-        }
+        } as (() -> Void)
 
         textInputs[4].placeHolderText = "Multiline"
         textInputs[4].type = .multiline
         textInputs[4].showCharacterCounterLabel(with: 160)
-
-
+        textInputs[4].keyboardAppearance = .dark
+        
         // Text attributes (as well as any other property, can be configured using styles (AnimatedTextInputStyle) or using textInput's propoerties
         textInputs[4].lineSpacing = 15
         textInputs[4].font = UIFont.systemFont(ofSize: 13)
@@ -69,10 +73,12 @@ class ViewController: UIViewController {
 }
 
 struct CustomTextInputStyle: AnimatedTextInputStyle {
-
+    let placeholderInactiveColor = UIColor.gray
     let activeColor = UIColor.orange
     let inactiveColor = UIColor.gray.withAlphaComponent(0.3)
     let lineInactiveColor = UIColor.gray.withAlphaComponent(0.3)
+    let lineActiveColor = UIColor.orange
+    let lineHeight: CGFloat = 3
     let errorColor = UIColor.red
     let textInputFont = UIFont.systemFont(ofSize: 14)
     let textInputFontColor = UIColor.black
